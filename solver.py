@@ -65,16 +65,19 @@ def eval_guess(guess, valid_words):
     return entropy(probs)
 
 
-def get_best_guess(valid_words, all_words):
+def get_best_guess(valid_words, all_words, top: int = 5):
     # TODO: multiprocessing
-    max_entropy = 0
-    best_guess = ""
+    guess_entropy_pairs = []
     for guess in tqdm(all_words):
         ent = eval_guess(guess, valid_words)
-        if ent > max_entropy:
-            max_entropy = ent
-            best_guess = guess
-    return best_guess
+        guess_entropy_pairs.append((guess, ent))
+    guess_entropy_pairs = sorted(
+        guess_entropy_pairs, key=lambda x: x[1], reverse=True
+    )
+    return [
+        guess_entropy_pair[0]
+        for guess_entropy_pair in guess_entropy_pairs[:top]
+    ]
 
 
 if __name__ == "__main__":
@@ -93,7 +96,8 @@ if __name__ == "__main__":
             else "tares"
         )
         print(
-            f"\nThe best guess is '{best_guess}' (over {len(valid_words)}/{len(all_words)})."
+            f"\nThe best guesses are '{best_guess}'"
+            f"(over {len(valid_words)}/{len(all_words)})."
         )
 
         # enter the guessing result
