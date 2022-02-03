@@ -1,9 +1,7 @@
-# from os import cpu_count
 from pathlib import Path
 
 from scipy.stats import entropy
 
-# from tqdm.contrib.concurrent import process_map
 from tqdm import tqdm
 
 WORD_LEN = 5
@@ -40,12 +38,15 @@ def match(word, guess):
 
 def update_word_list(valid_words, guess, a_chars, b_chars):
     result = []
+    absent_chars = set(guess) - set(a_chars + b_chars)
     for word in valid_words:
         try:
             for a_c in a_chars:
                 assert word.index(a_c) == guess.index(a_c)
             for b_c in b_chars:
                 assert word.index(b_c) != guess.index(b_c)
+            for abs_c in absent_chars:
+                assert abs_c not in word
             result.append(word)
         except Exception:
             pass
@@ -65,10 +66,9 @@ def eval_guess(guess, valid_words):
     return entropy(probs)
 
 
-def get_best_guess(valid_words, all_words, top: int = 5):
-    # TODO: multiprocessing
+def get_best_guess(valid_words, search_space, top: int = 3):
     guess_entropy_pairs = []
-    for guess in tqdm(all_words):
+    for guess in tqdm(search_space):
         ent = eval_guess(guess, valid_words)
         guess_entropy_pairs.append((guess, ent))
     guess_entropy_pairs = sorted(
@@ -76,7 +76,9 @@ def get_best_guess(valid_words, all_words, top: int = 5):
     )
     return [
         guess_entropy_pair[0]
-        for guess_entropy_pair in guess_entropy_pairs[:top]
+        for guess_entropy_pair in guess_entropy_pairs[
+            : min(top, len(guess_entropy_pairs))
+        ]
     ]
 
 
@@ -87,14 +89,12 @@ if __name__ == "__main__":
         valid_words = get_valid_words([word.rstrip() for word in fp])
     all_words = [word for word in valid_words]
 
-    n_trials = 0
     while True:
         # guess a word
-        best_guess = (
-            get_best_guess(valid_words, all_words)
-            if WORD_LEN != 5 or n_trials != 0
-            else "tares"
-        )
+        if len(valid_words) > len(all_words) * 0.01:
+            best_guess = get_best_guess(valid_words, all_words)
+        else:
+            best_guess = get_best_guess(valid_words, valid_words)
         print(
             f"\nThe best guesses are '{best_guess}'"
             f"(over {len(valid_words)}/{len(all_words)})."
@@ -108,5 +108,3 @@ if __name__ == "__main__":
         print(valid_words)
         if len(a_chars) == 5:
             break
-
-        n_trials += 1
