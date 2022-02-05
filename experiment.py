@@ -1,10 +1,13 @@
 from pathlib import Path
 import json
 from statistics import mean
+from random import sample
 
 from tqdm import tqdm
 
 from solver import WordleHelper, get_valid_words, WORD_LEN
+
+SAMPLE_SIZE = 500
 
 
 def compare(word, guess):
@@ -27,7 +30,7 @@ if __name__ == "__main__":
 
     # iterate all words
     result = {}
-    for word in tqdm(word_list):
+    for word in tqdm(sample(word_list, SAMPLE_SIZE)):
         solver = WordleHelper(word_list)
         history = []
         n_trial = 1
@@ -42,14 +45,13 @@ if __name__ == "__main__":
             res = compare(word, guess)
             if len(res[0]) == WORD_LEN:
                 break
-            else:
-                solver.update_valid_words(guess, res[0], res[1])
-                n_trial += 1
+            solver.update_valid_words(guess, res[0], res[1])
+            n_trial += 1
 
         result[word] = {"count": n_trial, "history": "-".join(history)}
 
     # write result
-    with open(Path("data") / "experiment_result.json", "w") as fp:
+    with open(Path("data") / "experiment_result_sample.json", "w") as fp:
         json.dump(result, fp, indent=4)
 
     # statistics

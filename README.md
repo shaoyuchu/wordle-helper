@@ -2,7 +2,7 @@
 
 ### Introduction
 
-WordleHelper suggests words to helps players better enjoy the hit game [Wordle](https://www.powerlanguage.co.uk/wordle/).
+WordleHelper suggests words to helps players better enjoy the hit game [Wordle](https://www.powerlanguage.co.uk/wordle/). WordleHelper takes an average of 4.18 guesses to hit the correct word.
 
 ### Usage
 

@@ -70,8 +70,13 @@ class WordleHelper:
                 entropies = pool.map(self._eval_guess, search_list)
 
         # sort based on entropy
+        if top_k == 1:
+            idx = entropies.index(max(entropies))
+            return [search_list[idx]]
         all_gue_ent = sorted(
-            list(zip(search_list, entropies)), key=lambda x: x[1], reverse=True
+            list(zip(search_list, entropies)),
+            key=lambda x: x[1],
+            reverse=True,
         )
         n_best = min(top_k, len(all_gue_ent))
         return [gue_ent[0] for gue_ent in all_gue_ent[:n_best]]
