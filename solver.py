@@ -109,12 +109,8 @@ class WordleHelper:
 
 
 def get_valid_words(word_list):
-    """Filter words and return those containing `WORD_LEN` unique characters"""
-    return [
-        word
-        for word in word_list
-        if len(word) == WORD_LEN and len(set(word)) == WORD_LEN
-    ]
+    """Filter words and return those containing `WORD_LEN` characters"""
+    return [word for word in word_list if len(word) == WORD_LEN]
 
 
 if __name__ == "__main__":
