@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 from statistics import mean
 from random import sample
+from collections import Counter
 
 from tqdm import tqdm
 
@@ -33,6 +34,7 @@ if __name__ == "__main__":
     for word in tqdm(sample(word_list, SAMPLE_SIZE)):
         solver = WordleHelper(word_list)
         history = []
+        n_valid = []
         n_trial = 1
         while True:
             if n_trial == 1:
@@ -40,6 +42,7 @@ if __name__ == "__main__":
             else:
                 guess = solver.get_best_guess(top_k=1, progress_bar=False)[0]
             history.append(guess)
+            n_valid.append(len(solver.valid_words))
 
             # get compare results
             res = compare(word, guess)
@@ -48,7 +51,11 @@ if __name__ == "__main__":
             solver.update_valid_words(guess, res[0], res[1])
             n_trial += 1
 
-        result[word] = {"count": n_trial, "history": "-".join(history)}
+        result[word] = {
+            "count": n_trial,
+            "history": "-".join(history),
+            "n_valid": "-".join([str(num) for num in n_valid]),
+        }
 
     # write result
     with open(Path("data") / "experiment_result_sample.json", "w") as fp:
@@ -59,3 +66,6 @@ if __name__ == "__main__":
     print(f"min = {min(all_counts)}")
     print(f"max = {max(all_counts)}")
     print(f"mean = {mean(all_counts)}")
+    counter = Counter(stat["count"] for stat in list(result.values()))
+    for key in sorted(list(counter.keys())):
+        print(f"{key} trials: {counter[key]}")
