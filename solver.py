@@ -1,9 +1,8 @@
 from pathlib import Path
+from statistics import mean
 from typing import List
 from os import cpu_count, get_terminal_size
 import json
-
-from scipy.stats import entropy
 
 from tqdm.contrib.concurrent import process_map
 from multiprocessing import Pool
@@ -72,7 +71,11 @@ class WordleHelper:
             match_result = match(word, guess)
             match_dist.setdefault(match_result, 0)
             match_dist[match_result] += 1
-        return -entropy(list(match_dist.values()))
+
+        # expected group size
+        group_sizes = list(match_dist.values())
+        total = sum(group_sizes)
+        return mean((size ** 2) / total for size in group_sizes)
 
     def get_best_guess(self, top_k: int = 5, progress_bar: bool = True):
         """Get the top `top_k` guesses.

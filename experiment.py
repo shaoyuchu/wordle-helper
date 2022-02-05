@@ -25,7 +25,7 @@ if __name__ == "__main__":
         n_trial = 1
         while True:
             if n_trial == 1:
-                guess = "soare"
+                guess = "raise"
             else:
                 guess = wh.get_best_guess(top_k=1, progress_bar=False)[0]
             history.append(guess)

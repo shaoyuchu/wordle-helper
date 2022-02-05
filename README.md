@@ -5,7 +5,7 @@
 ### Introduction
 
 WordleHelper suggests words to helps players better enjoy the hit game [Wordle](https://www.powerlanguage.co.uk/wordle/).
-WordleHelper hits the corrrect word with an average of 3.53 trials. **All** Wordle words can be guessed within 6 trials, while **over 91%** of the words can be guessed in the first 4 tiles.
+WordleHelper hits the corrrect word with an average of **3.55** trials. **Over 99.9%** Wordle words can be guessed within 6 trials, while **over 91%** of the words can be guessed in the first 4 tiles.
 
 ### Usage
 
