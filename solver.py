@@ -54,7 +54,7 @@ class WordleHelper:
 
         If there are less than `top_k` valid words, return all."""
         # evaluate all guesses
-        if len(self.valid_words) < len(self.all_words) * 0.01:
+        if len(self.valid_words) < len(self.all_words) * 0.005:
             search_list = self.valid_words
         else:
             search_list = self.all_words
