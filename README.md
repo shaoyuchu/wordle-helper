@@ -2,7 +2,7 @@
 
 ### Introduction
 
-WordleHelper suggests words to helps players better enjoy the hit game [Wordle](https://www.powerlanguage.co.uk/wordle/). WordleHelper takes an average of 4.08 guesses to hit the correct word.
+WordleHelper suggests words to helps players better enjoy the hit game [Wordle](https://www.powerlanguage.co.uk/wordle/). WordleHelper takes an average of 3.92 guesses to hit the correct word.
 
 ### Usage
 

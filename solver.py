@@ -15,6 +15,7 @@ class WordleHelper:
     def __init__(self, word_list: List[str]):
         self.all_words = word_list
         self.valid_words = deepcopy(word_list)
+        self.n_green = 0
 
     def _match(self, word: str, guess: str):
         """Compute the match result of the two words.
@@ -90,6 +91,7 @@ class WordleHelper:
         guess = guess.lower()
         g_chars, y_chars = g_chars.lower(), y_chars.lower()
         absent_chars = set(guess).difference(set(g_chars + y_chars))
+        self.n_green = max(self.n_green, len(g_chars))
 
         new_valid_words = []
         for word in self.valid_words:
