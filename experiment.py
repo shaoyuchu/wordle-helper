@@ -13,13 +13,13 @@ if __name__ == "__main__":
     word_list_path = Path("data") / "wordle_words.json"
     with open(word_list_path, "r") as fp:
         word_dict = json.load(fp)
-        word_list = word_dict["La"] + word_dict["Ta"]
+        valid_words = word_dict["La"] + word_dict["Ta"]
         candidates = word_dict["La"]
 
     # iterate all words
     result = {}
     for word in tqdm(candidates):
-        wh = WordleHelper(word_list, candidates)
+        wh = WordleHelper(valid_words, candidates)
         history = []
         n_valid = []
         n_trial = 1
@@ -29,7 +29,7 @@ if __name__ == "__main__":
             else:
                 guess = wh.get_best_guess(top_k=1, progress_bar=False)[0]
             history.append(guess)
-            n_valid.append(len(wh.valid_words))
+            n_valid.append(len(wh.candidates))
 
             # get compare results
             guess_result = match(word, guess)
