@@ -50,9 +50,7 @@ if __name__ == "__main__":
 
     # statistics
     all_counts = [stat["count"] for stat in list(result.values())]
-    print(f"min = {min(all_counts)}")
-    print(f"max = {max(all_counts)}")
-    print(f"mean = {mean(all_counts)}")
+    print(f"mean = {'{:.3f}'.format(mean(all_counts))}")
     counter = Counter(stat["count"] for stat in list(result.values()))
     for key in sorted(list(counter.keys())):
         print(f"{key} trials: {counter[key]}")

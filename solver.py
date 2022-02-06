@@ -80,7 +80,7 @@ class WordleHelper:
         If there are less than `top_k` valid words, return all."""
         # candidates
         is_close = (len(self.valid_words) < 30) and not (
-            len(self.valid_words) > 3 and self.n_green >= WORD_LEN - 2
+            len(self.valid_words) > 2 and self.n_green >= WORD_LEN - 2
         )
         if is_close:
             cand = self.valid_words
