@@ -25,9 +25,10 @@ def compare(word, guess):
 if __name__ == "__main__":
 
     # construct word list
-    word_list_path = Path("data") / "words_alpha.txt"
+    word_list_path = Path("data") / "wordle_words.json"
     with open(word_list_path, "r") as fp:
-        word_list = get_valid_words([word.rstrip() for word in fp])
+        word_dict = json.load(fp)
+        word_list = word_dict["La"] + word_dict["Ta"]
 
     # iterate all words
     result = {}

@@ -2,6 +2,7 @@ from pathlib import Path
 from copy import deepcopy
 from typing import List
 from os import cpu_count
+import json
 
 from scipy.stats import entropy
 
@@ -108,17 +109,13 @@ class WordleHelper:
         self.valid_words = new_valid_words
 
 
-def get_valid_words(word_list):
-    """Filter words and return those containing `WORD_LEN` characters"""
-    return [word for word in word_list if len(word) == WORD_LEN]
-
-
 if __name__ == "__main__":
 
     # construct word list
-    word_list_path = Path("data") / "words_alpha.txt"
+    word_list_path = Path("data") / "wordle_words.json"
     with open(word_list_path, "r") as fp:
-        word_list = get_valid_words([word.rstrip() for word in fp])
+        word_dict = json.load(fp)
+        word_list = word_dict["La"] + word_dict["Ta"]
 
     # start wordle-solver
     solver = WordleHelper(word_list)

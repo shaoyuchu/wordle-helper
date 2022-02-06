@@ -2,7 +2,7 @@
 
 ### Introduction
 
-WordleHelper suggests words to helps players better enjoy the hit game [Wordle](https://www.powerlanguage.co.uk/wordle/). WordleHelper takes an average of 3.92 guesses to hit the correct word.
+WordleHelper suggests words to helps players better enjoy the hit game [Wordle](https://www.powerlanguage.co.uk/wordle/).
 
 ### Usage
 
@@ -22,7 +22,3 @@ python3 solver.py
 3. Enter the green characters, e.g. lt[Enter]
 4. Enter the yellow characters, e.g. a[Enter]
 5. Continue, until you hit the word!
-
-### Credit
-
-The word list is downloaded from https://github.com/dwyl/english-words.

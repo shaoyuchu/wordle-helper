@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 
 **.json
+!data/wordle_words.json
