@@ -1,7 +1,6 @@
 from pathlib import Path
-from copy import deepcopy
 from typing import List
-from os import cpu_count
+from os import cpu_count, get_terminal_size
 import json
 
 from scipy.stats import entropy
@@ -10,39 +9,67 @@ from tqdm.contrib.concurrent import process_map
 from multiprocessing import Pool
 
 WORD_LEN = 5
+SUGGEST_S = "The suggested words are {words} ({v_len} candidates left)."
+INPUT_GUESS_S = "Enter the word you guessed: "
+INVALID_GUESS_S = (
+    "Invalid guess. The guessed word should contain "
+    f"exactly {WORD_LEN} alphabetic characters."
+)
+INPUT_GUESS_RES_S = "Enter the guessing result, e.g. y-yg-: "
+INVALID_GUESS_RES_S = (
+    "Invalid result. The result should contain exactly "
+    f"{WORD_LEN} characters from ['g', 'y', '-']."
+)
+GAME_END_S = "Congratulations!!"
+
+
+def match(word: str, guess: str):
+    """Compute the match result of the two words.
+
+    Returns
+    -------
+    match_result: str
+        A string representing the guess results,
+        where `g`, `y`, `-` stands for the green, yellow,
+        and grey characters, respectively.
+    """
+    word_l, guess_l = list(word), list(guess)
+    match_result = ["-" for i in range(WORD_LEN)]
+
+    # green
+    for i in range(WORD_LEN):
+        if guess_l[i] == word_l[i]:
+            match_result[i] = "g"
+            word_l[i] = guess_l[i] = "."
+
+    # yellow
+    for i in range(WORD_LEN):
+        if guess_l[i] != "." and guess_l[i] in word_l:
+            match_result[i] = "y"
+            word_l[word_l.index(guess_l[i])] = "."
+    return "".join(match_result)
 
 
 class WordleHelper:
-    def __init__(self, word_list: List[str]):
-        self.all_words = word_list
-        self.valid_words = deepcopy(word_list)
-        self.n_green = 0
+    def __init__(self, word_list: List[str], candidates: List[str]):
+        """Init WordleHelper.
 
-    def _match(self, word: str, guess: str):
-        """Compute the match result of the two words.
-
-        Returns
-        -------
-        match_result: str
-            A string with the format '`green`-`yellow`-`grey`', where
-            `green`, `yellow`, `grey` represents the sorted green, yellow,
-            and grey characters, respectively.
+        Parameters
+        ----------
+        word_list: str
+            A list of all valid words.
+        candidates: str
+            A list of candidate words.
         """
-        grn, yllw, gry = set(), set(), set()
-        for i in range(WORD_LEN):
-            if guess[i] == word[i]:
-                grn.add(guess[i])
-            elif guess[i] in word:
-                yllw.add(guess[i])
-            else:
-                gry.add(guess[i])
-        return "-".join("".join(sorted(chars)) for chars in [grn, yllw, gry])
+        self.all_words = word_list
+        self.valid_words = candidates
+        self.n_green = 0
 
     def _eval_guess(self, guess: str):
         """Evaluate a guess and return the resulting metric."""
         match_dist = {}
         for word in self.valid_words:
-            match_result = self._match(word, guess)
+            match_result = match(word, guess)
             match_dist.setdefault(match_result, 0)
             match_dist[match_result] += 1
         return -entropy(list(match_dist.values()))
@@ -77,63 +104,57 @@ class WordleHelper:
         n_best = min(top_k, len(all_gue_met))
         return [gue_met[0] for gue_met in all_gue_met[:n_best]]
 
-    def update_valid_words(self, guess: str, g_chars: str, y_chars: str):
+    def update_valid_words(self, guess: str, guess_result: str):
         """Update the list of valid words based on the guess and its results.
 
         Parameters
         ----------
         guess: str
             The word you guessed.
-        g_chars: str
-            A string containing green characters.
-        y_chars: str
-            A string containing yellow characters.
+        guess_result: str
+            A string representing the guess results,
+            where `g`, `y`, `-` stands for the green, yellow,
+            and grey characters, respectively.
         """
         guess = guess.lower()
-        g_chars, y_chars = g_chars.lower(), y_chars.lower()
-        absent_chars = set(guess).difference(set(g_chars + y_chars))
-        self.n_green = max(self.n_green, len(g_chars))
-
-        new_valid_words = []
-        for word in self.valid_words:
-            try:
-                for g_c in g_chars:
-                    assert word.index(g_c) == guess.index(g_c)
-                for y_c in y_chars:
-                    assert word.index(y_c) != guess.index(y_c)
-                for abs_c in absent_chars:
-                    assert abs_c not in word
-                new_valid_words.append(word)
-            except Exception:
-                pass
-        self.valid_words = new_valid_words
+        self.n_green = max(self.n_green, guess_result.count("g"))
+        self.valid_words = [
+            word
+            for word in self.valid_words
+            if match(word, guess) == guess_result
+        ]
 
 
 if __name__ == "__main__":
-
     # construct word list
     word_list_path = Path("data") / "wordle_words.json"
     with open(word_list_path, "r") as fp:
         word_dict = json.load(fp)
         word_list = word_dict["La"] + word_dict["Ta"]
+        candidates = word_dict["La"]
 
-    # start wordle-solver
-    solver = WordleHelper(word_list)
+    # start wordle-helper
+    wh = WordleHelper(word_list, candidates)
     while True:
         # guess a word
-        best_guesses = solver.get_best_guess()
-        print(
-            f"\nThe suggested words are {best_guesses} "
-            f"(over {len(solver.valid_words)})."
-        )
+        best_guesses = wh.get_best_guess()
+        print(SUGGEST_S.format(words=best_guesses, v_len=len(wh.valid_words)))
 
         # enter the guessing result
-        guess = input("Enter the word you guessed: ")
-        g_chars = input("Enter the green character(s): ")
-        y_chars = input("Enter the yellow character(s): ")
-        solver.update_valid_words(guess, g_chars, y_chars)
+        guess = input(INPUT_GUESS_S)
+        while len(guess) != WORD_LEN and not guess.isalpha():
+            print(INVALID_GUESS_S)
+
+        guess_res = input(INPUT_GUESS_RES_S)
+        while len(guess_res) != WORD_LEN or not set(guess_res) <= set("gy-"):
+            print(INVALID_GUESS_RES_S)
+            guess_res = input(INPUT_GUESS_RES_S)
+        print("-" * get_terminal_size(0)[0])
+
+        # update valid words
+        wh.update_valid_words(guess, guess_res)
 
         # hit
-        if len(g_chars) == 5:
-            print("Congratulations!!")
+        if guess_res == "ggggg":
+            print(GAME_END_S)
             break

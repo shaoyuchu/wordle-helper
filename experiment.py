@@ -6,21 +6,9 @@ from collections import Counter
 
 from tqdm import tqdm
 
-from solver import WordleHelper, get_valid_words, WORD_LEN
+from solver import WordleHelper, WORD_LEN, match
 
-SAMPLE_SIZE = 500
-
-
-def compare(word, guess):
-    g_chars = ""
-    y_chars = ""
-    for i in range(WORD_LEN):
-        if guess[i] == word[i]:
-            g_chars += guess[i]
-        elif guess[i] in word:
-            y_chars += guess[i]
-    return (g_chars, y_chars)
-
+SAMPLE_SIZE = 10
 
 if __name__ == "__main__":
 
@@ -29,27 +17,28 @@ if __name__ == "__main__":
     with open(word_list_path, "r") as fp:
         word_dict = json.load(fp)
         word_list = word_dict["La"] + word_dict["Ta"]
+        candidates = word_dict["La"]
 
     # iterate all words
     result = {}
-    for word in tqdm(sample(word_list, SAMPLE_SIZE)):
-        solver = WordleHelper(word_list)
+    for word in tqdm(sample(candidates, SAMPLE_SIZE)):
+        wh = WordleHelper(word_list, candidates)
         history = []
         n_valid = []
         n_trial = 1
         while True:
             if n_trial == 1:
-                guess = "tares"
+                guess = "soare"
             else:
-                guess = solver.get_best_guess(top_k=1, progress_bar=False)[0]
+                guess = wh.get_best_guess(top_k=1, progress_bar=False)[0]
             history.append(guess)
-            n_valid.append(len(solver.valid_words))
+            n_valid.append(len(wh.valid_words))
 
             # get compare results
-            res = compare(word, guess)
-            if len(res[0]) == WORD_LEN:
+            guess_result = match(word, guess)
+            if guess_result.count("g") == WORD_LEN:
                 break
-            solver.update_valid_words(guess, res[0], res[1])
+            wh.update_valid_words(guess, guess_result)
             n_trial += 1
 
         result[word] = {
