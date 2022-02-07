@@ -2,6 +2,8 @@ from pathlib import Path
 from typing import List
 from os import cpu_count, get_terminal_size
 import json
+from enum import Enum
+import argparse
 
 from scipy.stats import entropy
 
@@ -50,8 +52,18 @@ def match(word: str, guess: str):
     return "".join(match_result)
 
 
+class GameMode(Enum):
+    Easy = 1
+    Hard = 2
+
+
 class WordleHelper:
-    def __init__(self, valid_words: List[str], candidates: List[str]):
+    def __init__(
+        self,
+        valid_words: List[str],
+        candidates: List[str],
+        mode: GameMode = GameMode.Easy,
+    ):
         """Init WordleHelper.
 
         Parameters
@@ -60,9 +72,12 @@ class WordleHelper:
             A list of all valid words.
         candidates: str
             A list of candidate words.
+        mode: str
+            The mode of the game (`easy` or `hard`).
         """
         self.valid_words = valid_words
         self.candidates = candidates
+        self.mode = mode
         self.n_green = 0
 
     def _eval_guess(self, guess: str):
@@ -123,9 +138,20 @@ class WordleHelper:
             for word in self.candidates
             if match(word, guess) == guess_result
         ]
+        if self.mode == GameMode.Hard:
+            self.valid_words = [
+                word
+                for word in self.valid_words
+                if match(word, guess) == guess_result
+            ]
 
 
 if __name__ == "__main__":
+    # parse arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--hard", action="store_true")
+    args = parser.parse_args()
+
     # construct word list
     word_list_path = Path("data") / "wordle_words.json"
     with open(word_list_path, "r") as fp:
@@ -134,7 +160,8 @@ if __name__ == "__main__":
         candidates = word_dict["La"]
 
     # start wordle-helper
-    wh = WordleHelper(valid_words, candidates)
+    mode = GameMode.Hard if args.hard else GameMode.Easy
+    wh = WordleHelper(valid_words, candidates, mode)
     while True:
         # guess a word
         best_guesses = wh.get_best_guess()

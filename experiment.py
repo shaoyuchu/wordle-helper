@@ -2,12 +2,18 @@ from pathlib import Path
 import json
 from statistics import mean
 from collections import Counter
+import argparse
 
 from tqdm import tqdm
 
-from solver import WordleHelper, WORD_LEN, match
+from solver import GameMode, WordleHelper, match, WORD_LEN
 
 if __name__ == "__main__":
+    # parse arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--hard", action="store_true")
+    args = parser.parse_args()
+    mode = GameMode.Hard if args.hard else GameMode.Easy
 
     # construct word list
     word_list_path = Path("data") / "wordle_words.json"
@@ -19,7 +25,7 @@ if __name__ == "__main__":
     # iterate all words
     result = {}
     for word in tqdm(candidates):
-        wh = WordleHelper(valid_words, candidates)
+        wh = WordleHelper(valid_words, candidates, mode)
         history = []
         n_valid = []
         n_trial = 1

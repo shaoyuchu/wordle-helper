@@ -4,8 +4,9 @@
 
 ### Introduction
 
-WordleHelper suggests words to helps players better enjoy the hit game [Wordle](https://www.powerlanguage.co.uk/wordle/).
-WordleHelper hits the corrrect word with an average of **_3.53_** trials. **All** Wordle words can be guessed within 6 trials, while **over 91%** of the words can be guessed in the first 4 tiles.
+WordleHelper suggests words to help players better enjoy the hit game [Wordle](https://www.powerlanguage.co.uk/wordle/). Both the general mode and the hard mode are supported.
+
+WordleHelper hits the corrrect word with an average of **_3.53_** trials. For both game modes, **100%** Wordle words can be guessed within 6 trials, while **over 91%** of the words can be guessed in the first 4 tiles.
 
 ### Usage
 
@@ -13,7 +14,7 @@ WordleHelper hits the corrrect word with an average of **_3.53_** trials. **All*
 
 ```
 pip3 install -r requirements.txt
-python3 solver.py
+python3 solver.py [--hard]
 ```
 
 #### How to play Wordle with WordleHelper’s assistance?
