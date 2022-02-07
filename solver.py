@@ -72,8 +72,8 @@ class WordleHelper:
             A list of all valid words.
         candidates: str
             A list of candidate words.
-        mode: str
-            The mode of the game (`easy` or `hard`).
+        mode: GameMode
+            The mode of the game.
         """
         self.valid_words = valid_words
         self.candidates = candidates
