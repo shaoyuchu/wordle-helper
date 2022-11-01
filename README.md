@@ -4,7 +4,7 @@
 
 ### Introduction
 
-WordleHelper suggests words to help players better enjoy the hit game [Wordle](https://www.powerlanguage.co.uk/wordle/). Both the general mode and the hard mode are supported.
+WordleHelper suggests words to help players better enjoy the hit game [Wordle](https://www.nytimes.com/games/wordle/index.html). Both the general mode and the hard mode are supported.
 
 WordleHelper hits the corrrect word with an average of **_3.53_** trials. For both game modes, **100%** Wordle words can be guessed within 6 trials, while **over 91%** of the words can be guessed in the first 4 tiles.
 
